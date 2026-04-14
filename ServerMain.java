@@ -40,7 +40,7 @@ class ClientHandler extends Thread {
 
             String message;
             //listen for client messages
-            while ((message = in.readLine()) != null) {
+            while ((message = in.readLine()) != null) { //read input and also check if client still conn
                 System.out.println("Received: " + message);
 
                 broadcast(message); //broadcast it to all connected clients
@@ -49,6 +49,7 @@ class ClientHandler extends Thread {
             System.out.println("Client disconnected: " + socket.getInetAddress()); //show ip of disconn client, maybe change later since its not safe to show ip
         } finally {
             try {
+                ServerMain.clients.remove(this); //remove this client from list when it disconns
                 socket.close(); //makes so that socket closes no matter what
             } catch (Exception e) {
                 e.printStackTrace(); //print report about exception
