@@ -41,7 +41,7 @@ class ClientHandler extends Thread {
             String message;
             //listen for client messages
             while ((message = in.readLine()) != null) { //read input and also check if client still conn
-                System.out.println("Received: " + message);
+                System.out.println("[SERVER RECEIVED]: " + message);
 
                 broadcast(message); //broadcast it to all connected clients
             }
