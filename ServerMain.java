@@ -1,9 +1,10 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ServerMain {
-    public static List<ClientHandler> clients = new ArrayList<>(); //shared list of clients
+    public static List<ClientHandler> clients = new CopyOnWriteArrayList<>(); //shared list of clients, if a user joins or leaves when broadcast forloop running, java won't throw error
     public static void main(String[] args) {
         try {
             int port = 1234;
@@ -69,10 +70,9 @@ class ClientHandler extends Thread {
     }
     private void broadcast(String message) {
         for (ClientHandler clientThread : ServerMain.clients) {
-            clientThread.out.println(message);
-            //if (clientThread != this) { //server sends message to every client except sender client
-                //clientThread.out.println(message);
-            //}
+            if (clientThread != this) { //server sends message to every client except sender client
+                clientThread.out.println(message);
+            }
         }
     }
 }
