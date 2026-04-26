@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ServerMain {
-    public static List<ClientHandler> clients = new CopyOnWriteArrayList<>(); //shared list of clients, if a user joins or leaves when broadcast forloop running, java won't throw error
+    public static List<ClientHandler> clients = new CopyOnWriteArrayList<>(); //shared list of clients, prevent crash if a user joins or leaves while broadcast forloop running
     public static void main(String[] args) {
         try {
             int port = 1234;
@@ -48,13 +48,17 @@ class ClientHandler extends Thread {
             out.println("Welcome, " + username + "!");
             System.out.println(username + " connected from: " + socket.getInetAddress());
             broadcast("[SERVER]: " + username + " has joined the chat.");
+            broadcastUserList();
 
             String message;
             //listen for client messages
             while ((message = in.readLine()) != null) { //read input and also check if client still conn
                 System.out.println("[SERVER RECEIVED]: " + message);
-
-                broadcast(username + ": " + message); //broadcast it to all connected clients
+                if (message.equalsIgnoreCase("/users")) { //use command to see updated list
+                    getUserList();
+                } else {
+                    broadcast(username + ": " + message); //broadcast it to all connected clients
+                }                
             }
         } catch (IOException e) {
             System.out.println("Client disconnected: " + socket.getInetAddress()); //show ip of disconn client, maybe change later since its not safe to show ip
@@ -62,6 +66,7 @@ class ClientHandler extends Thread {
             try {
                 ServerMain.clients.remove(this); //remove this client from list when it disconns
                 broadcast("[SERVER]: " + username + " has left the chat.");
+                broadcastUserList();
                 socket.close(); //makes so that socket closes no matter what
             } catch (Exception e) {
                 e.printStackTrace(); //print report about exception
@@ -70,9 +75,24 @@ class ClientHandler extends Thread {
     }
     private void broadcast(String message) {
         for (ClientHandler clientThread : ServerMain.clients) {
-            if (clientThread != this) { //server sends message to every client except sender client
-                clientThread.out.println(message);
+            clientThread.out.println(message);
+        }
+    }
+    private String userListString() {
+        StringBuilder userList = new StringBuilder(); //modify same string, dynamically build string of active users
+        for (ClientHandler clientThread : ServerMain.clients) {
+            if (clientThread.username != null) {
+                userList.append(clientThread.username).append(", ");
             }
         }
+        return userList.toString();
+        
+    }
+    private void getUserList() {
+        out.println("USERS ONLINE: " + userListString());
+    }
+    private void broadcastUserList() {
+        String currentList = userListString();
+        broadcast("[SERVER LIVE LIST]: " + currentList);
     }
 }
