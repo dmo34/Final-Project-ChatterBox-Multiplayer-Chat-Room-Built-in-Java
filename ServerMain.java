@@ -49,12 +49,20 @@ class ClientHandler extends Thread {
                 } else if (ServerMain.clients.containsKey(input.toLowerCase())) {
                     out.println("[SERVER]: Username is not available.");
                 } else {
-                    username = input; //if not empty and not taken, user gets username
+                    username = input;
                     ServerMain.clients.put(username.toLowerCase(), this); //key = lowercase name, value = this thread
-                    break; //exit loop to start chatting
+                    break; //exit loop to begin
                 } 
             }
             out.println("Welcome, " + username + "!");
+
+            List<String> chatHistory = ChatStorer.readChatHistory();
+            if (!chatHistory.isEmpty()) {
+                out.println("recent chat history:");
+                for (String oldMessage : chatHistory) {
+                    out.println(oldMessage);
+                }
+            }
             System.out.println(username + " connected from: " + socket.getInetAddress());
             broadcast("[SERVER]: " + username + " has joined the chat.");
             broadcastUserList();
@@ -70,7 +78,7 @@ class ClientHandler extends Thread {
                 }                
             }
         } catch (IOException e) {
-            System.out.println("Client disconnected: " + socket.getInetAddress()); //show ip of disconn client, maybe change later since its not safe to show ip
+            System.out.println("Client disconnected: " + socket.getInetAddress());
         } finally {
             try {
                 if (username != null) {
@@ -85,6 +93,7 @@ class ClientHandler extends Thread {
         }
     }
     private void broadcast(String message) {
+        ChatStorer.record(message); //when message broadcasted, its also recorded
         for (ClientHandler clientThread : ServerMain.clients.values()) { //get values
             clientThread.out.println(message);
         }
@@ -104,5 +113,27 @@ class ClientHandler extends Thread {
     private void broadcastUserList() {
         String currentList = userListString();
         broadcast("[SERVER LIVE LIST]: " + currentList);
+    }
+}
+class ChatStorer { //storing chats on server/txt file
+    private static String file_name = "chat_history.txt";
+    public static synchronized void record(String message) { //synch so that only 1 thread writes at a time
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file_name, true))) { //true = append new message to file instead of rewriting entire history
+            writer.println(message);
+        } catch(IOException e) {
+            System.out.println("ERROR: Could not write to file");
+        }
+    }
+    public static List<String> readChatHistory() {
+        List<String> chatHistory = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file_name))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                chatHistory.add(line);
+            }
+        } catch (IOException e) {
+            //there can be no chathistory txt made yet, exception so that java recognizes this
+        }
+        return chatHistory;
     }
 }
