@@ -5,4 +5,4 @@ Deliverables (to be done):
 3. Global and Local Chats - Allow messages to either be global (every member can see them) or DM (only the intended recipient and sender can see them).
        [1/2 DONE] - Global messages by default, DM feature will be added next.
    
-5. Persistent Chats - Chats should be stored on the server and able to be reloaded if server shuts down or client reconnects.
+5. Persistent Chats - Chats should be stored on the server and able to be reloaded if server shuts down or client reconnects. [DONE] Chats and conn/disconn info are stored in a txt file on server, client sees reloaded chat history when they join/reconnect.
