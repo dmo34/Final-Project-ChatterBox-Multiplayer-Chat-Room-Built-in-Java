@@ -6,3 +6,5 @@ Deliverables (to be done):
        [1/2 DONE] - Global messages by default, DM feature will be added next.
    
 5. Persistent Chats - Chats should be stored on the server and able to be reloaded if server shuts down or client reconnects. [DONE] Chats and conn/disconn info are stored in a txt file on server, client sees reloaded chat history when they join/reconnect.
+
+Also, added GUI for client side.
