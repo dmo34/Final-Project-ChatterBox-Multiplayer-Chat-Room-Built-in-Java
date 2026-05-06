@@ -1,9 +1,10 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerMain {
-    public static Map<String, ClientHandler> clients = new java.util.concurrent.ConcurrentHashMap<>(); //shared map of clients, prevent crash if a user joins or leaves while broadcast forloop running
+    public static Map<String, ClientHandler> clients = new ConcurrentHashMap<>(); //shared map of clients, prevent crash if a user joins or leaves while broadcast forloop running
     public static void main(String[] args) {
         try {
             int port = 1234;
