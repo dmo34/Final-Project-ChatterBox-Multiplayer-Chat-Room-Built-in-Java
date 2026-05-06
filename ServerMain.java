@@ -35,7 +35,7 @@ class ClientHandler extends Thread {
         //handle client comms
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true); //autoflush, forces data to be sent right away across network
+            out = new PrintWriter(socket.getOutputStream(), true); //autoflush, send data to socket immediately
             
             while (true) { 
                 out.println("Enter username: ");
@@ -58,7 +58,7 @@ class ClientHandler extends Thread {
 
             List<String> chatHistory = ChatStorer.readChatHistory();
             if (!chatHistory.isEmpty()) {
-                out.println("recent chat history:");
+                out.println("RECENT CHAT HISTORY:");
                 for (String oldMessage : chatHistory) {
                     out.println(oldMessage);
                 }
@@ -88,7 +88,7 @@ class ClientHandler extends Thread {
                     socket.close(); //socket closes no matter what
                 }
             } catch (Exception e) {
-                e.printStackTrace(); //print report about exception
+                e.printStackTrace();
             } 
         }
     }
@@ -116,9 +116,9 @@ class ClientHandler extends Thread {
     }
 }
 class ChatStorer { //storing chats on server/txt file
-    private static String file_name = "chat_history.txt";
+    private static String fileName = "chat_history.txt";
     public static synchronized void record(String message) { //synch so that only 1 thread writes at a time
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file_name, true))) { //true = append new message to file instead of rewriting entire history
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName, true))) { //true = append new message to file instead of rewriting entire history
             writer.println(message);
         } catch(IOException e) {
             System.out.println("ERROR: Could not write to file");
@@ -126,7 +126,7 @@ class ChatStorer { //storing chats on server/txt file
     }
     public static List<String> readChatHistory() {
         List<String> chatHistory = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file_name))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 chatHistory.add(line);
