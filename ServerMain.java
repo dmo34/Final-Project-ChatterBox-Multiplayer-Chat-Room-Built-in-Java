@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerMain {
-    public static Map<String, ClientHandler> clients = new ConcurrentHashMap<>(); //shared map of clients, prevent crash if a user joins or leaves while broadcast forloop running
+    public static Map<String, ClientHandler> clients = new ConcurrentHashMap<>(); //threadsafe map of clients, prevent crash if a user joins or leaves while broadcast forloop running
     public static void main(String[] args) {
         try {
             int port = 1234;
@@ -100,7 +100,7 @@ class ClientHandler extends Thread {
         }
     }
     private String userListString() {
-        StringBuilder userList = new StringBuilder(); //modify same string, dynamically build string of active users
+        StringBuilder userList = new StringBuilder(); //modify same string, build mutable string of active users
         for (ClientHandler clientThread : ServerMain.clients.values()) {
             if (clientThread.username != null) {
                 userList.append(clientThread.username).append(", ");
@@ -120,13 +120,14 @@ class ChatStorer { //storing chats on server/txt file
     private static String fileName = "chat_history.txt";
     public static synchronized void record(String message) { //synch so that only 1 thread writes at a time
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName, true))) { //true = append new message to file instead of rewriting entire history
-            writer.println(message);
+            String timeStamp = new java.util.Date().toString(); //show time when message sent
+            writer.println("(" + timeStamp + ")" + message);
         } catch(IOException e) {
             System.out.println("ERROR: Could not write to file");
         }
     }
     public static List<String> readChatHistory() {
-        List<String> chatHistory = new ArrayList<>();
+        List<String> chatHistory = new ArrayList<>(); //polymorph
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
