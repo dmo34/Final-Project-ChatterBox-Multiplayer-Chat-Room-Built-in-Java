@@ -23,9 +23,9 @@ public class ClientMain {
 
         frame.add(new JScrollPane(chatSpace), BorderLayout.CENTER);
         frame.add(inputSpace, BorderLayout.SOUTH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack(); //window started very small without this
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         inputSpace.addActionListener(new ActionListener() {
             @Override
@@ -41,7 +41,7 @@ public class ClientMain {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true); //autoflush
             
-            //lambda background thread to listen for server messages
+            //lambda background thread to listen for server messages from server while main thread continues reading user input
             new Thread(() -> {
                 try {
                     String response;
@@ -50,11 +50,13 @@ public class ClientMain {
                         chatSpace.setCaretPosition(chatSpace.getDocument().getLength()); //move cursor to end of text so chat autoscrolls to show newest message
                     }
                 } catch (IOException e) {
+                    JOptionPane.showMessageDialog(frame, "ERROR: Something went wrong.");
                     e.printStackTrace();
                 }
-            }).start(); //create new thread to listen for messages from server while main thread continues reading user input
+            }).start();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "ERROR: Unable to connect to server." );
+            e.printStackTrace();
         }
     }
 }
