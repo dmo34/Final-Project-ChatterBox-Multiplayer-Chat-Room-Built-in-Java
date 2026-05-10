@@ -8,3 +8,7 @@ Deliverables (to be done):
 5. Persistent Chats - Chats should be stored on the server and able to be reloaded if server shuts down or client reconnects. [DONE] Chats and conn/disconn info are stored in a txt file on server, client sees reloaded chat history when they join/reconnect.
 
 Also, added GUI for client side.
+
+How to start the server as well as connect as a client:
+       compile and run ServerMain.java, server will notify that it has started listening
+       compile and run ClientMain.java, GUI will appear asking you to enter name, client can disconnect by closing window
