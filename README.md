@@ -10,5 +10,5 @@ Deliverables (to be done):
 Also, added GUI for client side.
 
 How to start the server as well as connect as a client:
-       compile and run ServerMain.java, server will notify that it has started listening
-       compile and run ClientMain.java, GUI will appear asking you to enter name, client can disconnect by closing window
+       1. Compile and run ServerMain.java, server will notify that it has started listening.
+       2. Compile and run ClientMain.java, GUI will appear asking you to enter name, client can disconnect by closing window
