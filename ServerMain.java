@@ -74,6 +74,8 @@ class ClientHandler extends Thread {
                 System.out.println("[SERVER RECEIVED]: " + message);
                 if (message.equalsIgnoreCase("/users")) { //use command to see updated list
                     getUserList();
+                } else if (message.toLowerCase().startsWith("/msg ")) {
+                    handleDirectMessage(message);
                 } else {
                     broadcast(username + ": " + message); //broadcast it to all connected clients
                 }                
@@ -114,6 +116,24 @@ class ClientHandler extends Thread {
     private void broadcastUserList() {
         String currentList = userListString();
         broadcast("[SERVER LIVE LIST]: " + currentList);
+    }
+    private void handleDirectMessage(String rawMsg) {
+        String[] pieces = rawMsg.split(" ", 3); //chop msg into 3 pieces at spaces
+        if (pieces.length < 3) {
+            out.println("[SERVER]: Invalid DM format. Use: /msg -username- -message-");
+            return;
+        }
+        String targetName = pieces[1];
+        String privMsg = pieces[2];
+        ClientHandler targetClient = ServerMain.clients.get(targetName.toLowerCase());
+        if (targetClient != null) {
+            targetClient.out.println("[DM from " + username + "]: " + privMsg);
+
+            out.println("[DM to " + targetClient.username + "]: " + privMsg); //so DM sender can see what they sent
+            ChatStorer.record(rawMsg);
+        } else {
+            out.println("[SERVER]: User '" + targetName + "' not found.");
+        }
     }
 }
 class ChatStorer { //storing chats on server/txt file
